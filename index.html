@@ -364,28 +364,44 @@
         setInterval(updateOverlay, 50);
 
         startBtn.onclick = () => {
-            setDifficulty();
-            
-            music.play();
-            if ('mediaSession' in navigator) {
-                navigator.mediaSession.setActionHandler('previoustrack', () => handleInput('left'));
-                navigator.mediaSession.setActionHandler('nexttrack', () => handleInput('right'));
+            // Reset and Prep Music
+            music.currentTime = 0;
+            music.volume = 1.0; 
+        
+            music.play().then(() => {
+                console.log("Music Active - Status 206 Confirmed");
                 
-                // Use Play/Pause buttons to cycle background color
-                // We also force music.play() so the audio doesn't actually stop
-                navigator.mediaSession.setActionHandler('play', () => {
-                    cycleBackgroundColor();
-                    music.play();
-                });
-                navigator.mediaSession.setActionHandler('pause', () => {
-                    cycleBackgroundColor();
-                    music.play();
-                });
-            }
-            gameLoop();
-            startBtn.textContent = "LINK ACTIVE - OPEN WIN+A";
-            startBtn.disabled = true;
+                setDifficulty();
+                
+                if ('mediaSession' in navigator) {
+                    // Force the playback state to 'playing' so Windows notices
+                    navigator.mediaSession.playbackState = 'playing';
+        
+                    navigator.mediaSession.setActionHandler('previoustrack', () => handleInput('left'));
+                    navigator.mediaSession.setActionHandler('nexttrack', () => handleInput('right'));
+                    
+                    const handleToggle = () => {
+                        cycleBackgroundColor();
+                        music.play();
+                        navigator.mediaSession.playbackState = 'playing';
+                    };
+        
+                    navigator.mediaSession.setActionHandler('play', handleToggle);
+                    navigator.mediaSession.setActionHandler('pause', handleToggle);
+                    
+                    // Initial overlay update to "kick" Windows into showing the UI
+                    updateOverlay();
+                }
+        
+                gameLoop();
+                startBtn.textContent = "LINK ACTIVE - OPEN WIN+A";
+                startBtn.disabled = true;
+            }).catch(err => {
+                console.error("Audio playback failed:", err);
+                alert("Audio Error: " + err.message);
+            });
         };
     </script>
 </body>
 </html>
+
