@@ -111,7 +111,7 @@
         <div class="instructions">
             <p>1. Click Initialize above.</p>
             <p>2. Press <b>Win + A</b> to open Media Controls.</p>
-            <p>3. Press <b>Prev ($|<<$)</b> or <b>Next ($>>|$)</b> to START.</p>
+            <p>3. Press <b>Prev (&#9198;)</b> or <b>Next (&#9197;)</b> to START.</p>
             <p>4. Press <b>Play/Pause</b> to tune background color.</p>
         </div>
     </div>
@@ -120,7 +120,7 @@
 
     <script>
         // --- 1. SETUP ---
-        const canvas = document.createElement('canvas');
+        const canvas = document.createElement('canvas'); // create "headless" canvas
         canvas.width = 256;
         canvas.height = 256;
         const ctx = canvas.getContext('2d');
@@ -141,7 +141,7 @@
         let inputQueue = [];
         let gameOverTime = 0; // Timestamp for death
         
-        // Settings
+        // Settings, initialized to default casual settings
         let tileCount = 16; 
         let gridSize = 16;
         let scoreMultiplier = 1;
@@ -152,8 +152,8 @@
         
         // Reset on difficulty change
         difficultySelect.onchange = () => {
-            if (gameState === 'PLAYING' || gameState === 'GAMEOVER') {
-                resetGame();
+            if (gameState === 'PLAYING') {
+                gameState = 'GAMEOVER';
             } else {
                 setDifficulty(); 
             }
@@ -166,10 +166,10 @@
             updateOverlay();
         };
 
-        // Helper to cycle background from Media Keys
+        // Helper to cycle background from Play/Pause Media Key
         function cycleBackgroundColor() {
             bgGrayValue = (bgGrayValue + 10);
-            if (bgGrayValue > 80) bgGrayValue = 0;
+            if (bgGrayValue > 90) bgGrayValue = 0;
             
             // Sync the HTML slider to match
             bgSlider.value = bgGrayValue;
@@ -182,11 +182,11 @@
 
         function setDifficulty() {
             const level = difficultySelect.value;
-            if (level === 'casual') {
+            if (level === 'casual') { // coarser grid, slower game speed
                 tileCount = 8;
                 scoreMultiplier = 1;
                 gameSpeed = 1000 / 6;
-            } else if (level === 'gamer') {
+            } else if (level === 'gamer') { // finer grid, faster game speed
                 tileCount = 16;
                 scoreMultiplier = 2;
                 gameSpeed = 1000 / 8;
@@ -230,8 +230,8 @@
             // Safety Delay Check for Game Over
             if (gameState === 'GAMEOVER') {
                 const now = Date.now();
-                if (now - gameOverTime < 1500) {
-                    // Block input if less than 1.5 seconds have passed
+                if (now - gameOverTime < 1000) {
+                    // Block input if less than 1 seconds have passed, so you don't clear game over screen accidentally
                     return;
                 }
                 resetGame();
@@ -289,7 +289,7 @@
         }
 
         function draw() {
-            // 1. Draw Background (Using Slider Value)
+            // Draw Background (Using Slider Value)
             ctx.fillStyle = 'black'; 
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
@@ -297,7 +297,7 @@
             ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
             ctx.fillRect(4, 4, canvas.width - 8, canvas.height - 8);
 
-            // 2. State Drawing
+            // State Drawing
             if (gameState === 'MENU') {
                 drawText("PRESS KEY", "TO START");
                 return;
@@ -314,12 +314,13 @@
                 return;
             }
 
-            // 3. Draw Game Elements
+            // Draw Food
             ctx.fillStyle = '#ff3333';
             ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
 
+            // Draw Snake
             for (let i = 0; i < snake.length; i++) {
-                ctx.fillStyle = (i === 0) ? '#ccffcc' : '#00ff00';
+                ctx.fillStyle = '#00ff00';
                 ctx.fillRect(snake[i].x * gridSize, snake[i].y * gridSize, gridSize - 2, gridSize - 2);
             }
         }
@@ -338,7 +339,7 @@
                 let artistText = `High Score: ${highScore}`;
 
                 if (gameState === 'MENU') {
-                    titleText = "System Snake Ultimate";
+                    titleText = "Snake: Windows Media Controls Edition";
                     artistText = "Press Prev/Next Track to START...";
                 } else if (gameState === 'GAMEOVER') {
                     titleText = "GAME OVER";
@@ -348,7 +349,7 @@
                 navigator.mediaSession.metadata = new MediaMetadata({
                     title: titleText,
                     artist: artistText,
-                    artwork: [{ src: canvas.toDataURL('image/png'), sizes: '256x256', type: 'image/png' }]
+                    artwork: [{ src: canvas.toDataURL('image/png'), sizes: '256x256', type: 'image/png' }] // pushes current game screen to album art
                 });
             }
         }
@@ -361,16 +362,14 @@
             setTimeout(() => requestAnimationFrame(gameLoop), gameSpeed); 
         }
 
-        setInterval(updateOverlay, 50);
+        setInterval(updateOverlay, 50); // Changing this value lower doesn't change anything since we are limited by how fast the metadata can be updated
 
         startBtn.onclick = () => {
             // Reset and Prep Music
             music.currentTime = 0;
             music.volume = 1.0; 
         
-            music.play().then(() => {
-                console.log("Music Active - Status 206 Confirmed");
-                
+            music.play().then(() => {                
                 setDifficulty();
                 
                 if ('mediaSession' in navigator) {
@@ -382,7 +381,7 @@
                     
                     const handleToggle = () => {
                         cycleBackgroundColor();
-                        music.play();
+                        music.play(); // explicitly play the music again so that play/puase doesn't stop the music at all
                         navigator.mediaSession.playbackState = 'playing';
                     };
         
@@ -404,4 +403,5 @@
     </script>
 </body>
 </html>
+
 
