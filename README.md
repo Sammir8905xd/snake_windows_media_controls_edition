@@ -1,13 +1,10 @@
-
-
-
-
-
 # Snake: Windows Media Controls Edition
 **_"Have you ever wanted to play snake inside the album art of the windows media controls overlay? Probably not, but now you can!"_**
 
 ## What is This?
 This is a fully functional Snake game that lives where it shouldn't: inside the Windows Media Controls Overlay (`Win + A`). It works by hijacking the browser's MediaSession API and HTML5 Canvas to stream a live game feed as "Album Artwork" while a silent track plays in the background—tricking Windows into thinking a classic arcade game is actually just a silent song that is pretty indecisive about what its metadata is.
+
+The game "screen" is displayed where the album art would normally go, score is tracked in the song title, and high score in the artist name. Kebyoard media buttons are used to control the game.
 
 <table>
   <tr>
