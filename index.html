@@ -117,7 +117,7 @@
             <div style="font-size: 0.8em; color: #888; margin-bottom: 5px;">
                 Use slider OR press <b>Play/Pause</b> in-game to cycle colors.
             </div>
-            <input type="range" id="bgSlider" min="0" max="80" value="0">
+            <input type="range" id="bgSlider" min="0" max="255" value="0">
         </div>
 
         <div class="instructions">
@@ -180,8 +180,8 @@
 
         // Helper to cycle background from Play/Pause Media Key
         function cycleBackgroundColor() {
-            bgGrayValue = (bgGrayValue + 10);
-            if (bgGrayValue > 90) bgGrayValue = 0;
+            bgGrayValue = (bgGrayValue + 25.5);
+            if (bgGrayValue > 255) bgGrayValue = 0;
             
             // Sync the HTML slider to match
             bgSlider.value = bgGrayValue;
@@ -415,6 +415,7 @@
     </script>
 </body>
 </html>
+
 
 
 
