@@ -2,300 +2,298 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Snake: Windows Media Controls Edition</title>
-    <link rel="icon" type="image/x-icon" href="favicon.ico">
-    <meta property="og:title" content="Snake: Windows Media Controls Edition">
-    <meta property="og:description" content="Play snake inside your Windows Media Controls overlay, just like you've always wanted to!">
-    <meta property="og:image" content="https://thegoodjakeward.github.io/snake_windows_media_controls_edition/social.png">
-    <meta property="og:url" content="https://thegoodjakeward.github.io/snake_windows_media_controls_edition/">
-
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:site" content="https://thegoodjakeward.github.io/snake_windows_media_controls_edition/">
-    <meta name="twitter:title" content="Snake: Windows Media Controls Edition">
-    <meta name="twitter:description" content="Play snake inside your Windows Media Controls overlay, just like you've always wanted to!">
-    <meta name="twitter:image" content="https://thegoodjakeward.github.io/snake_windows_media_controls_edition/social.png">
-    
     <style>
+        :root {
+            --neon-green: #0f0;
+            --dark-bg: #111;
+            --panel-bg: #222;
+        }
+
         body { 
-            background: #111; 
+            background: var(--dark-bg); 
             color: #eee; 
-            font-family: 'Segoe UI', sans-serif; 
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; 
             display: flex; 
             flex-direction: column; 
             align-items: center; 
             justify-content: center; 
-            height: 100vh; 
+            min-height: 100vh; 
             margin: 0; 
+            padding: 20px;
         }
         
         h1 {
-            margin: 0 0 20px 0;
+            margin: 0 0 10px 0;
             font-weight: 300;
             letter-spacing: 2px;
-            color: #0f0;
+            color: var(--neon-green);
             text-transform: uppercase;
-            text-align:center;
+            text-align: center;
             text-shadow: 0 0 10px rgba(0, 255, 0, 0.3);
         }
 
-        .panel {
-            background: #222;
-            padding: 2rem;
-            border-radius: 8px;
-            border: 1px solid #444;
-            text-align: center;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-            width: 350px;
+        .subtitle {
+            color: #888;
+            margin-bottom: 30px;
+            font-size: 0.9rem;
         }
 
+        .panel {
+            background: var(--panel-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            border: 1px solid #444;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        #status-indicator {
+            display: inline-block;
+            width: 10px;
+            height: 10px;
+            border-radius: 50%;
+            background: #ff3333;
+            margin-right: 8px;
+        }
+        #status-indicator.active { background: var(--neon-green); box-shadow: 0 0 8px var(--neon-green); }
+
         button { 
-            padding: 15px 30px; 
-            font-size: 18px; 
+            padding: 16px; 
+            font-size: 16px; 
             cursor: pointer; 
-            background: #0f0; 
+            background: var(--neon-green); 
             color: #000;
             border: none; 
             font-weight: bold; 
-            border-radius: 4px; 
+            border-radius: 6px; 
             margin-bottom: 20px;
             width: 100%;
+            transition: transform 0.1s, background 0.2s;
         }
-        button:hover { background: #0c0; }
-        button:disabled { background: #444; color: #888; cursor: not-allowed; }
+        button:hover { background: #0c0; transform: translateY(-2px); }
+        button:active { transform: translateY(0); }
+        button:disabled { background: #444; color: #888; cursor: not-allowed; transform: none; }
 
         .settings-group {
-            margin: 15px 0;
+            margin: 20px 0;
             text-align: left;
         }
 
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
+        label { display: block; margin-bottom: 8px; font-size: 0.85rem; color: #bbb; text-transform: uppercase; }
         
         select {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             background: #333;
             color: #fff;
             border: 1px solid #555;
-            border-radius: 4px;
+            border-radius: 6px;
+            outline: none;
         }
 
         .slider-container {
             margin-top: 20px;
             text-align: left;
             background: #1a1a1a;
-            padding: 10px;
-            border-radius: 4px;
-            border: 1px solid #444;
+            padding: 15px;
+            border-radius: 6px;
+            border: 1px solid #333;
         }
 
         input[type=range] {
             width: 100%;
-            margin-top: 5px;
+            margin-top: 10px;
             cursor: pointer;
+            accent-color: var(--neon-green);
         }
 
-        .instructions { font-size: 0.9em; color: #aaa; margin-top: 20px; line-height: 1.5; }
+        .instructions { 
+            font-size: 0.85rem; 
+            color: #888; 
+            margin-top: 25px; 
+            line-height: 1.6; 
+            text-align: left;
+            border-top: 1px solid #333;
+            padding-top: 15px;
+        }
+        
+        /* Preview of the actual game canvas for visual feedback */
+        #visual-preview {
+            margin-top: 20px;
+            border: 2px solid #333;
+            background: #000;
+            width: 128px;
+            height: 128px;
+            image-rendering: pixelated;
+        }
     </style>
 </head>
 <body>
 
-    <h1>Snake: Windows Media <br/>Controls Edition</h1>
+    <h1>SNAKE <small style="font-size: 0.5em; vertical-align: middle;">OS EDITION</small></h1>
+    <p class="subtitle">Play inside the Windows Media Overlay</p>
 
     <div class="panel">
-        <button id="startBtn">INITIALIZE SYSTEM LINK</button>
+        <button id="startBtn">
+            <span id="status-indicator"></span>INITIALIZE SYSTEM LINK
+        </button>
         
         <div class="settings-group">
-            <label for="difficulty">Difficulty Level:</label>
+            <label for="difficulty">Hardware Profile (Difficulty):</label>
             <select id="difficulty">
-                <option value="casual" selected>Casual (8x8 Grid - 1x Pts)</option>
-                <option value="gamer">Gamer (16x16 Grid - 2x Pts)</option>
+                <option value="casual" selected>Casual (8x8 Grid)</option>
+                <option value="gamer">Gamer (16x16 Grid)</option>
+                <option value="ultra">Ultra (32x32 Grid)</option>
             </select>
         </div>
 
         <div class="slider-container">
-            <label for="bgSlider">Background Matcher</label>
-            <div style="font-size: 0.8em; color: #888; margin-bottom: 5px;">
-                Use slider OR press <b>Play/Pause</b> in-game to cycle colors.
-            </div>
-            <input type="range" id="bgSlider" min="0" max="255" value="0">
+            <label for="bgSlider">Overlay Background Calibration</label>
+            <input type="range" id="bgSlider" min="0" max="255" value="30">
         </div>
 
+        <canvas id="visual-preview" width="256" height="256"></canvas>
+
         <div class="instructions">
-            <p>1. Click Initialize above.</p>
-            <p>2. Press <b>Win + A</b> to open Media Controls.</p>
-            <p>3. Press <b>Prev (&#9198;)</b> or <b>Next (&#9197;)</b> to START.</p>
-            <p>4. Press <b>Play/Pause</b> to tune background color.</p>
+            <p><strong>1.</strong> Click <b>Initialize</b> to start the "stream".</p>
+            <p><strong>2.</strong> Press <b>Win + A</b> (Windows 11) or check the top-left volume popup (Windows 10).</p>
+            <p><strong>3.</strong> Use <b>Previous Track</b> to turn Left, <b>Next Track</b> to turn Right.</p>
+            <p><strong>4.</strong> Press <b>Play/Pause</b> to cycle background colors if visibility is poor.</p>
         </div>
     </div>
 
-    <audio id="bgMusic" loop src="music.mp3"></audio>
+    <!-- Hidden audio element needed for MediaSession -->
+    <audio id="silentAudio" loop></audio>
 
     <script>
-        // --- 1. SETUP ---
-        const canvas = document.createElement('canvas'); // create "headless" canvas
-        canvas.width = 256;
-        canvas.height = 256;
+        /**
+         * Logic for Snake: Media Controls Edition
+         */
+        const canvas = document.getElementById('visual-preview');
         const ctx = canvas.getContext('2d');
-        
         const startBtn = document.getElementById('startBtn');
-        const music = document.getElementById('bgMusic');
+        const silentAudio = document.getElementById('silentAudio');
         const difficultySelect = document.getElementById('difficulty');
         const bgSlider = document.getElementById('bgSlider');
+        const statusInd = document.getElementById('status-indicator');
 
-        // Game State Variables
+        // Game State
         let gameState = 'MENU'; 
         let highScore = 0;
         let score = 0;
         let snake = [];
         let food = { x: 0, y: 0 };
-        let dx = 0; 
+        let dx = 1; 
         let dy = 0; 
         let inputQueue = [];
-        let gameOverTime = 0; // Timestamp for death
+        let gameOverTime = 0;
         
-        // Settings, initialized to default casual settings
+        // Config
         let tileCount = 8; 
         let gridSize = 32;
-        let scoreMultiplier = 1;
-        let bgGrayValue = 0; // 0-255
-        let gameSpeed = 1000 / 6;
+        let bgGrayValue = 30;
+        let gameSpeed = 150;
 
-        // --- 2. INPUT LISTENERS ---
-        
-        // Reset on difficulty change
-        difficultySelect.onchange = () => {
-            if (gameState === 'PLAYING') {
-                gameState = 'GAMEOVER';
-            } else {
-                setDifficulty(); 
-            }
-        };
-
-        // Real-time Background Update from Slider
-        bgSlider.oninput = () => {
-            bgGrayValue = parseInt(bgSlider.value);
-            draw();
-            updateOverlay();
-        };
-
-        // Helper to cycle background from Play/Pause Media Key
-        function cycleBackgroundColor() {
-            bgGrayValue = (bgGrayValue + 12.75);
-            if (bgGrayValue > 255) bgGrayValue = 0;
+        // Create a silent audio track programmatically since we don't have an MP3
+        function createSilentAudio() {
+            const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+            const streamDest = audioCtx.createMediaStreamDestination();
+            const oscillator = audioCtx.createOscillator();
+            const gainNode = audioCtx.createGain();
             
-            // Sync the HTML slider to match
-            bgSlider.value = bgGrayValue;
+            gainNode.gain.value = 0.001; // Extremely quiet but present
+            oscillator.connect(gainNode);
+            gainNode.connect(streamDest);
+            oscillator.start();
             
-            draw();
-            updateOverlay();
+            silentAudio.srcObject = streamDest.stream;
         }
-
-        // --- 3. LOGIC ---
 
         function setDifficulty() {
             const level = difficultySelect.value;
-            if (level === 'casual') { // coarser grid, slower game speed
-                score = 3;
+            if (level === 'casual') {
                 tileCount = 8;
-                scoreMultiplier = 1;
-                gameSpeed = 1000 / 6;
-            } else if (level === 'gamer') { // finer grid, faster game speed
-                score = 6;
+                gameSpeed = 200;
+            } else if (level === 'gamer') {
                 tileCount = 16;
-                scoreMultiplier = 2;
-                gameSpeed = 1000 / 8;
+                gameSpeed = 120;
+            } else if (level === 'ultra') {
+                tileCount = 32;
+                gameSpeed = 80;
             }
             gridSize = canvas.width / tileCount;
         }
 
         function resetGame() {
             setDifficulty();
-            
-            // Start in middle
             const mid = Math.floor(tileCount / 2);
             snake = [{x: mid, y: mid}, {x: mid-1, y: mid}, {x: mid-2, y: mid}];
-            
-            score = 3;
-            dx = 1; dy = 0; 
+            score = 0;
+            dx = 1; 
+            dy = 0; 
             inputQueue = [];
-            
             placeFood();
             gameState = 'PLAYING';
-            draw();
-            updateOverlay(); 
         }
 
         function placeFood() {
             let valid = false;
-            let attempts = 0;
-            while (!valid && attempts < 100) {
+            while (!valid) {
                 food.x = Math.floor(Math.random() * tileCount);
                 food.y = Math.floor(Math.random() * tileCount);
-                
-                valid = true;
-                for(let part of snake) {
-                    if(part.x === food.x && part.y === food.y) valid = false;
-                }
-                attempts++;
+                valid = !snake.some(p => p.x === food.x && p.y === food.y);
             }
         }
 
-        function handleInput(type) {
-            // Safety Delay Check for Game Over
-            if (gameState === 'GAMEOVER') {
-                const now = Date.now();
-                if (now - gameOverTime < 1000) {
-                    // Block input if less than 1 seconds have passed, so you don't clear game over screen accidentally
-                    return;
-                }
-                resetGame();
-                return;
-            }
-
-            // Start game from Menu
+        function handleInput(dir) {
             if (gameState === 'MENU') {
                 resetGame();
                 return;
             }
+            if (gameState === 'GAMEOVER') {
+                if (Date.now() - gameOverTime > 1000) resetGame();
+                return;
+            }
 
-            if (type === 'left') inputQueue.push('left');
-            if (type === 'right') inputQueue.push('right');
+            // Left/Right turning logic relative to current vector
+            if (dir === 'left') {
+                const newDx = dy;
+                const newDy = -dx;
+                dx = newDx; dy = newDy;
+            } else if (dir === 'right') {
+                const newDx = -dy;
+                const newDy = dx;
+                dx = newDx; dy = newDy;
+            }
         }
 
         function update() {
             if (gameState !== 'PLAYING') return;
 
-            if (inputQueue.length > 0) {
-                const turn = inputQueue.shift();
-                if (turn === 'left') {
-                    const temp = dx; dx = dy; dy = -temp;
-                } else if (turn === 'right') {
-                    const temp = dx; dx = -dy; dy = temp;
-                }
-            }
-
             const head = { x: snake[0].x + dx, y: snake[0].y + dy };
 
-            // Wrap Walls
+            // Wall Wrap
             if (head.x < 0) head.x = tileCount - 1;
             if (head.x >= tileCount) head.x = 0;
             if (head.y < 0) head.y = tileCount - 1;
             if (head.y >= tileCount) head.y = 0;
 
-            for (let part of snake) {
-                if (part.x === head.x && part.y === head.y) {
-                    gameState = 'GAMEOVER';
-                    gameOverTime = Date.now(); // Record time of death
-                    if (score > highScore) highScore = score;
-                    updateOverlay();
-                    return;
-                }
+            // Self Collision
+            if (snake.some(p => p.x === head.x && p.y === head.y)) {
+                gameState = 'GAMEOVER';
+                gameOverTime = Date.now();
+                if (score > highScore) highScore = score;
+                return;
             }
 
             snake.unshift(head);
 
             if (head.x === food.x && head.y === food.y) {
-                score += (1 * scoreMultiplier);
+                score++;
                 placeFood();
             } else {
                 snake.pop();
@@ -303,128 +301,122 @@
         }
 
         function draw() {
-            // Draw Background (Using Slider Value)
-            ctx.fillStyle = 'black'; 
+            // Background
+            ctx.fillStyle = `rgb(${bgGrayValue}, ${bgGrayValue}, ${bgGrayValue})`;
             ctx.fillRect(0, 0, canvas.width, canvas.height);
-            
-            const gray = bgGrayValue;
-            ctx.fillStyle = `rgb(${gray}, ${gray}, ${gray})`;
-            ctx.fillRect(4, 4, canvas.width - 8, canvas.height - 8);
 
-            // State Drawing
             if (gameState === 'MENU') {
-                drawText("PRESS KEY", "TO START");
-                return;
-            }
-
-            if (gameState === 'GAMEOVER') {
-                // Show "WAIT..." if in the safety lockout period
-                const now = Date.now();
-                if (now - gameOverTime < 1000) {
-                    drawText("GAME OVER", "WAIT...");
-                } else {
-                    drawText("GAME OVER", `FINAL: ${score}`);
-                }
-                return;
-            }
-
-            // Draw Food
-            ctx.fillStyle = '#ff3333';
-            ctx.fillRect(food.x * gridSize, food.y * gridSize, gridSize - 2, gridSize - 2);
-
-            // Draw Snake
-            for (let i = 0; i < snake.length; i++) {
-                ctx.fillStyle = '#00ff00';
-                ctx.fillRect(snake[i].x * gridSize, snake[i].y * gridSize, gridSize - 2, gridSize - 2);
-            }
-        }
-
-        function drawText(line1, line2) {
-            ctx.fillStyle = '#0f0';
-            ctx.font = 'bold 40px Courier New';
-            ctx.textAlign = 'center';
-            ctx.fillText(line1, canvas.width/2, canvas.height/2 - 20);
-            ctx.fillText(line2, canvas.width/2, canvas.height/2 + 30);
-        }
-
-        function updateOverlay() {
-            if ('mediaSession' in navigator) {
-                let titleText = `Score: ${score}`;
-                let artistText = `High Score: ${highScore}`;
-
-                if (gameState === 'MENU') {
-                    titleText = "Snake: Windows Media Controls Edition";
-                    artistText = "Press Prev/Next Track to START...";
-                } else if (gameState === 'GAMEOVER') {
-                    titleText = "GAME OVER";
-                    artistText = `Final: ${score} | Best: ${highScore}`;
-                }
-
-                navigator.mediaSession.metadata = new MediaMetadata({
-                    title: titleText,
-                    artist: artistText,
-                    artwork: [{ src: canvas.toDataURL('image/png'), sizes: '256x256', type: 'image/png' }] // pushes current game screen to album art
+                drawText("MEDIA SNAKE", "PRESS START");
+            } else if (gameState === 'GAMEOVER') {
+                drawText("GAME OVER", `SCORE: ${score}`);
+            } else {
+                // Food
+                ctx.fillStyle = '#ff3333';
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = '#ff3333';
+                ctx.fillRect(food.x * gridSize + 2, food.y * gridSize + 2, gridSize - 4, gridSize - 4);
+                
+                // Snake
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = '#0f0';
+                ctx.fillStyle = '#0f0';
+                snake.forEach((p, i) => {
+                    const alpha = 1 - (i / snake.length) * 0.5;
+                    ctx.globalAlpha = alpha;
+                    ctx.fillRect(p.x * gridSize + 1, p.y * gridSize + 1, gridSize - 2, gridSize - 2);
                 });
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
             }
         }
 
-        // --- 4. LOOPS ---
+        function drawText(l1, l2) {
+            ctx.fillStyle = '#0f0';
+            ctx.textAlign = 'center';
+            ctx.font = 'bold 28px "Segoe UI", sans-serif';
+            ctx.fillText(l1, canvas.width/2, canvas.height/2 - 10);
+            ctx.font = '18px "Segoe UI", sans-serif';
+            ctx.fillText(l2, canvas.width/2, canvas.height/2 + 30);
+        }
 
-        function gameLoop() {
+        async function updateMediaSession() {
+            if (!('mediaSession' in navigator)) return;
+
+            let title = `Score: ${score}`;
+            let artist = `Record: ${highScore}`;
+
+            if (gameState === 'MENU') {
+                title = "Snake: OS Edition";
+                artist = "Use Prev/Next Track";
+            } else if (gameState === 'GAMEOVER') {
+                title = "GAME OVER";
+                artist = `Score: ${score} (Best: ${highScore})`;
+            }
+
+            try {
+                const dataUrl = canvas.toDataURL('image/png');
+                navigator.mediaSession.metadata = new MediaMetadata({
+                    title: title,
+                    artist: artist,
+                    album: "Windows Media Controls Gaming",
+                    artwork: [{ src: dataUrl, sizes: '256x256', type: 'image/png' }]
+                });
+            } catch (e) {}
+        }
+
+        // Main Loops
+        function mainLoop() {
             update();
             draw();
-            setTimeout(() => requestAnimationFrame(gameLoop), gameSpeed); 
+            setTimeout(mainLoop, gameSpeed);
         }
 
-        setInterval(updateOverlay, 50); // Changing this value lower doesn't change anything since we are limited by how fast the metadata can be updated
+        // Independent metadata update (limited by OS refresh rate anyway)
+        setInterval(updateMediaSession, 100);
 
-        startBtn.onclick = () => {
-            // Reset and Prep Music
-            music.currentTime = 0;
-            music.volume = 1.0; 
-        
-            music.play().then(() => {                
-                setDifficulty();
+        // Control Bindings
+        bgSlider.oninput = (e) => {
+            bgGrayValue = e.target.value;
+        };
+
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowLeft') handleInput('left');
+            if (e.key === 'ArrowRight') handleInput('right');
+        });
+
+        startBtn.onclick = async () => {
+            try {
+                createSilentAudio();
+                await silentAudio.play();
                 
                 if ('mediaSession' in navigator) {
-                    // Force the playback state to 'playing' so Windows notices
                     navigator.mediaSession.playbackState = 'playing';
-        
+                    
                     navigator.mediaSession.setActionHandler('previoustrack', () => handleInput('left'));
                     navigator.mediaSession.setActionHandler('nexttrack', () => handleInput('right'));
                     
-                    const handleToggle = () => {
-                        cycleBackgroundColor();
-                        music.play(); // explicitly play the music again so that play/puase doesn't stop the music at all
-                        navigator.mediaSession.playbackState = 'playing';
+                    const handleCycle = () => {
+                        bgGrayValue = (parseInt(bgGrayValue) + 40) % 255;
+                        bgSlider.value = bgGrayValue;
+                        silentAudio.play(); 
                     };
-        
-                    navigator.mediaSession.setActionHandler('play', handleToggle);
-                    navigator.mediaSession.setActionHandler('pause', handleToggle);
                     
-                    // Initial overlay update to "kick" Windows into showing the UI
-                    updateOverlay();
+                    navigator.mediaSession.setActionHandler('play', handleCycle);
+                    navigator.mediaSession.setActionHandler('pause', handleCycle);
                 }
-        
-                gameLoop();
-                startBtn.textContent = "LINK ACTIVE - OPEN WIN+A";
+
+                gameState = 'MENU';
+                statusInd.classList.add('active');
+                startBtn.innerHTML = '<span id="status-indicator" class="active"></span>SYSTEM LINKED';
                 startBtn.disabled = true;
-            }).catch(err => {
-                console.error("Audio playback failed:", err);
-                alert("Audio Error: " + err.message);
-            });
+                
+                mainLoop();
+            } catch (err) {
+                console.error(err);
+                startBtn.textContent = "AUTH FAILED - CLICK AGAIN";
+            }
         };
+
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
